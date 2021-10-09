@@ -147,3 +147,6 @@ csgo_clips_autotrim/
 
 # Ignore datasets
 data/
+
+# Ignore local dir
+.local/
