@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM tensorflow/tensorflow:2.6.1-gpu-jupyter
 
 ENV RUNTIME_PACKAGES="ffmpeg"
 ENV BUILD_PACKAGES="build-essential git"
@@ -8,17 +8,10 @@ RUN apt-get update -y && \
     apt-get autoremove -y
 
 COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
+
 COPY requirements-dev.txt /tmp/
-
-RUN pip install --user -r /tmp/requirements.txt
-RUN pip install --user -r /tmp/requirements-dev.txt
-
-RUN apt-get remove --purge -y $BUILD_PACKAGES && \
-    apt-get autoremove -y
+RUN pip install -r /tmp/requirements-dev.txt
 
 ADD . /app
-WORKDIR /app
 
-USER 9999
-
-CMD ["/bin/bash"]

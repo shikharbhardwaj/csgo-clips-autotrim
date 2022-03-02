@@ -35,3 +35,7 @@ dist: clean
 
 clean:
 	rm -rf dist
+
+sync_lib:
+	nbdev_build_lib
+	pip install -e .
