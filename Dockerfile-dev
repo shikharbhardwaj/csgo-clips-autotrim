@@ -1,9 +1,12 @@
-FROM tensorflow/tensorflow:2.6.1-gpu-jupyter
+FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
 
-ENV RUNTIME_PACKAGES="ffmpeg"
-ENV BUILD_PACKAGES="build-essential git"
+ENV RUNTIME_PACKAGES="ffmpeg gosu"
+    ENV BUILD_PACKAGES="build-essential git"
 
-RUN apt-get update -y && \
+RUN apt-get update && \
+    apt-get install -y libasound2
+
+RUN apt-get update && \
     apt-get install -y $BUILD_PACKAGES $RUNTIME_PACKAGES && \
     apt-get autoremove -y
 
@@ -14,4 +17,7 @@ COPY requirements-dev.txt /tmp/
 RUN pip install -r /tmp/requirements-dev.txt
 
 ADD . /app
+WORKDIR /code
 
+ENTRYPOINT ["/app/utils/entrypoint.sh"]
+CMD ["jupyter", "lab"]
