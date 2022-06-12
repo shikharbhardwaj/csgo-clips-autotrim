@@ -150,3 +150,6 @@ data/
 
 # Ignore local dir
 .local/
+
+# wandb
+wandb/*

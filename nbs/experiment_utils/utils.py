@@ -7,7 +7,7 @@ import math
 from urllib.parse import urlparse
 import os
 
-from .constants import LOGGING_CONFIG
+from .constants import *
 
 
 def split_batches(xs: List, batch_size: int):
@@ -29,6 +29,15 @@ def logged_timer(logger):
             return result
         return wrapper
     return decorator
+
+
+def get_sample_videos_paths():
+    clips_dir = os.path.join(DATA_DIR, 'clips')
+    return [os.path.join(clips_dir, name) for name in os.listdir(clips_dir)]
+
+
+def get_data_path(suffix_path: List[str]):
+    return os.path.join(DATA_DIR, *suffix_path)
 
 
 def getLogger():
