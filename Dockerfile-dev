@@ -1,6 +1,6 @@
-FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
+FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
 
-ENV RUNTIME_PACKAGES="ffmpeg gosu tesseract-ocr"
+ENV RUNTIME_PACKAGES="ffmpeg gosu tesseract-ocr sudo curl"
 ENV BUILD_PACKAGES="build-essential git"
 
 RUN apt-get update && \
@@ -19,10 +19,12 @@ RUN pip install -r /tmp/requirements-dev.txt
 ADD . /app
 WORKDIR /app
 
-RUN nbdev_build_lib
+RUN nbdev_export
 RUN pip install -e .
 
 WORKDIR /code
+
+RUN nbdime extensions --enable
 
 ENTRYPOINT ["/app/utils/entrypoint.sh"]
 CMD ["jupyter", "lab", "--ip=0.0.0.0"]

@@ -2,3 +2,4 @@ jupyter
 jupyterlab
 nbdev
 wandb
+nbdime
