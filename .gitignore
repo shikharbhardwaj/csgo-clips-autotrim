@@ -153,3 +153,6 @@ data/
 
 # wandb
 wandb/*
+
+# Ignore secrets.
+.secrets/

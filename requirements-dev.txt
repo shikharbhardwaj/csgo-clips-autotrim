@@ -3,3 +3,4 @@ jupyterlab
 nbdev
 wandb
 nbdime
+label-studio

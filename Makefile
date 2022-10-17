@@ -39,3 +39,9 @@ clean:
 sync_lib:
 	nbdev_build_lib
 	pip install -e .
+
+build-docker-dev:
+	docker build -t csgo-clips-autotrim:pytorch -f Dockerfile-dev .
+
+run-docker-dev:
+	./utils/docker-start.sh
