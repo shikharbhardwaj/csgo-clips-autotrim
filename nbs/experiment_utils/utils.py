@@ -40,6 +40,6 @@ def get_data_path(suffix_path: List[str]):
     return os.path.join(DATA_DIR, *suffix_path)
 
 
-def getLogger():
+def getLogger(name: str = 'default'):
     dictConfig(LOGGING_CONFIG)
-    return logging.getLogger()
+    return logging.getLogger(name)

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Secrets:
     AZURE_BLOBSTORE_CONTAINER_URL: str
+    AZURE_BLOBSTORE_SAS_TOKEN: str
 
     @classmethod
     def try_load_from_secrets_file(cls) -> 'Secrets':
