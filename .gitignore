@@ -143,7 +143,7 @@ checklink/cookies.txt
 
 # Ignore the generated lib
 csgo-clips-autotrim/
-csgo_clips_autotrim/
+# csgo_clips_autotrim/
 
 # Ignore datasets
 data/
@@ -156,3 +156,6 @@ wandb/*
 
 # Ignore secrets.
 .secrets/
+
+# Output folders
+**/out/*
