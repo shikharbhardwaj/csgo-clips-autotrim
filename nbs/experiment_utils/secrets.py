@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 class Secrets:
     AZURE_BLOBSTORE_CONTAINER_URL: str
     AZURE_BLOBSTORE_SAS_TOKEN: str
+    MINIO_AWS_SECRET_ACCESS_KEY: str
+    MINIO_AWS_ACCESS_KEY_ID: str
 
     @classmethod
     def try_load_from_secrets_file(cls) -> 'Secrets':

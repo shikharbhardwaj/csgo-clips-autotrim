@@ -12,3 +12,6 @@ hvac==1.0.2
 datasets==2.6.1
 easyocr==1.6.2
 typer==0.9.0
+pycocotools==2.0.6
+boto3==1.26.160
+Pillow==9.5.0
