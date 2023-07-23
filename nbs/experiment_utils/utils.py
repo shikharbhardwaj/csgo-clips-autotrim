@@ -1,3 +1,4 @@
+from collections import namedtuple
 import copy
 import functools
 import json
@@ -11,8 +12,16 @@ import tempfile
 
 from typing import List, Optional
 
+import pandas as pd
+
 from .constants import *
 
+
+def getLogger(name: str = 'default'):
+    logging_config.dictConfig(LOGGING_CONFIG)
+    return logging.getLogger(name)
+
+logger = getLogger('utils')
 
 def split_batches(xs: List, batch_size: int):
     num_batches = int(math.ceil(len(xs) / batch_size))
@@ -42,11 +51,6 @@ def get_sample_videos_paths():
 
 def get_data_path(suffix_path: List[str]):
     return os.path.join(DATA_DIR, *suffix_path)
-
-
-def getLogger(name: str = 'default'):
-    logging_config.dictConfig(LOGGING_CONFIG)
-    return logging.getLogger(name)
 
 
 def add_image_list_to_label_studio_coco_annotations(annotations_path: str, image_list_path: str, base_path: Optional[str]) -> str:
@@ -93,3 +97,29 @@ def add_image_list_to_label_studio_coco_annotations(annotations_path: str, image
     
     with tempfile.NamedTemporaryFile(prefix='annotations', suffix='.json', delete=False) as f:
         json.dump(fixed_annotations_data, f)
+
+Tick = namedtuple('Tick', ['ts', 'description'])
+
+class TimeSplitTracker:
+    """Simple class to track time splits for a sequence of events in a function.
+    """
+
+    def __init__(self):
+        self._ticks = []
+
+    def add(self, descriptiion: str):
+        self._ticks.append(Tick(ts=time.perf_counter(), description=descriptiion))
+    
+    def show_summary(self):
+        if not logger.isEnabledFor(logging.DEBUG):
+            return
+
+        if len(self._ticks) <= 1:
+            logging.warning('No ticks to summarize.')
+            return
+
+        df = pd.DataFrame(self._ticks)
+        ts_diff = df['ts'].diff()
+        summary_df = pd.concat([df['description'].iloc[1:], ts_diff], axis=1).dropna()
+
+        print(summary_df)
