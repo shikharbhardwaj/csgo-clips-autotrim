@@ -111,9 +111,6 @@ class TimeSplitTracker:
         self._ticks.append(Tick(ts=time.perf_counter(), description=descriptiion))
     
     def show_summary(self):
-        if not logger.isEnabledFor(logging.DEBUG):
-            return
-
         if len(self._ticks) <= 1:
             logging.warning('No ticks to summarize.')
             return
