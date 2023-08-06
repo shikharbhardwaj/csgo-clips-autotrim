@@ -8,7 +8,8 @@ import tqdm
 import mmcv
 import typer
 
-from csgo_clips_autotrim.segmentation.elimination import InferenceConfig, get_weapon_segmentation_input, preprocess_image, segment_elimination_events, segment_weapon
+from csgo_clips_autotrim.experiment_utils.config import InferenceConfig
+from csgo_clips_autotrim.segmentation.elimination import get_weapon_segmentation_input, preprocess_image, segment_elimination_events, segment_weapon
 
 log = logging.getLogger(__name__)
 
