@@ -123,16 +123,20 @@ def elimination(image_dir_path: Annotated[Path,
       input_img = mmcv.imread(image_path)
       input_rgb = mmcv.imconvert(input_img, 'bgr', 'rgb')
 
-      preprocess_result = elimination_segmentation.preprocess_image(input_rgb, elimination_inference_config.mlflow_artifact_run_id)
+      height, width, channels = input_rgb.shape
+      mid_height, mid_width = height // 2, width // 2
+      cropped_input = input_rgb[:mid_height, mid_width:, :]
+
+      preprocess_result = elimination_segmentation.preprocess_image(cropped_input, elimination_inference_config.mlflow_artifact_run_id)
       segmentation_result = elimination_segmentation.segment_elimination_events(preprocess_result, image_path, elimination_inference_config)
 
       events_with_added_info = []
 
       for event in segmentation_result.elimination_events:
-         weapon_segmentation_input = elimination_segmentation.get_weapon_segmentation_input(input_rgb, event)
+         weapon_segmentation_input = elimination_segmentation.get_weapon_segmentation_input(cropped_input, event)
          weapon_segmentation_input_prep = elimination_segmentation.preprocess_image(weapon_segmentation_input, weapon_inference_config.mlflow_artifact_run_id)
          weapon_segmentation_result = elimination_segmentation.segment_weapon(event, weapon_segmentation_input_prep, weapon_inference_config)
-         player_recognition_result = elimination_segmentation.recognize_players(weapon_segmentation_result, input_rgb, ocr)
+         player_recognition_result = elimination_segmentation.recognize_players(weapon_segmentation_result, cropped_input, ocr)
 
          events_with_added_info.append(player_recognition_result)
       
