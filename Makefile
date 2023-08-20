@@ -1,6 +1,7 @@
 .ONESHELL:
 SHELL := /bin/bash
 SRC = $(wildcard nbs/*.ipynb)
+GIT_SHA := $(shell git rev-parse --short=8 HEAD)
 
 all: csgo-clips-autotrim docs
 
@@ -41,7 +42,11 @@ sync_lib:
 	pip install -e .
 
 build-docker-dev:
-	docker build -t csgo-clips-autotrim:pytorch -f Dockerfile-dev .
+	docker build -t csgo-clips-autotrim-dev:pytorch -f Dockerfile-dev .
 
 run-docker-dev:
 	./utils/docker-start.sh
+
+build-docker:
+	nbdev_export
+	docker build -t csgo-clips-autotrim:$(GIT_SHA) .

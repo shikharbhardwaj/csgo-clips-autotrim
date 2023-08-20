@@ -1,6 +1,7 @@
 import dataclasses
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Annotated
 import tqdm
@@ -20,7 +21,7 @@ app = typer.Typer()
 ELIMINATION_MODEL_RUN_ID = '254e228656e348078b8663502a68065a'
 ELIMINATION_MODEL_NAME='csgo-elimination-segmentation-yolov8'
 ELIMINATION_SCORE_THRESHOLD = 0.5
-TRITON_URL = 'localhost:8000'
+TRITON_URL = os.getenv('TRITON_URL', 'localhost:8000')
 
 default_elimination_inference_config = InferenceConfig(
          mlflow_artifact_run_id=ELIMINATION_MODEL_RUN_ID,

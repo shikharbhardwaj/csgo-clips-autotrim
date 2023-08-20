@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Annotated
 
@@ -15,7 +16,7 @@ app = typer.Typer()
 GAME_STATE_MODEL_RUN_ID = '2fe893e46e554b1e8b1ae44176677fb3'
 GAME_STATE_MODEL_NAME = 'csgo-game-state-segmentation-yolov8'
 GAME_STATE_SCORE_THRESHOLD = 0.5
-TRITON_URL = 'localhost:8000'
+TRITON_URL = os.getenv('TRITON_URL', 'localhost:8000')
 
 default_game_state_inference_config = InferenceConfig(
     mlflow_artifact_run_id=GAME_STATE_MODEL_RUN_ID,
