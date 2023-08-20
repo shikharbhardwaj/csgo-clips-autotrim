@@ -13,7 +13,7 @@ from csgo_clips_autotrim.ocr import TritonOCR
 from csgo_clips_autotrim.segmentation import elimination as elimination_segmentation
 from csgo_clips_autotrim.segmentation import postprocessing
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 app = typer.Typer()
 
@@ -123,6 +123,9 @@ def elimination(image_dir_path: Annotated[Path,
    images = image_dir_path.glob('*.png')
 
    for image_path in tqdm.tqdm(images):
+      name_stem = image_path.stem
+      json_path = output_dir / f'{name_stem}.json'
+
       input_img = mmcv.imread(image_path)
       input_rgb = mmcv.imconvert(input_img, 'bgr', 'rgb')
 
@@ -136,18 +139,20 @@ def elimination(image_dir_path: Annotated[Path,
       events_with_added_info = []
 
       for event in segmentation_result.elimination_events:
-         weapon_segmentation_input = elimination_segmentation.get_weapon_segmentation_input(cropped_input, event)
-         weapon_segmentation_input_prep = elimination_segmentation.preprocess_image(weapon_segmentation_input, weapon_inference_config.mlflow_artifact_run_id)
-         weapon_segmentation_result = elimination_segmentation.segment_weapon(event, weapon_segmentation_input_prep, weapon_inference_config)
-         player_recognition_result = elimination_segmentation.recognize_players(weapon_segmentation_result, cropped_input, ocr)
+         try:
+            weapon_segmentation_input = elimination_segmentation.get_weapon_segmentation_input(cropped_input, event)
+            weapon_segmentation_input_prep = elimination_segmentation.preprocess_image(weapon_segmentation_input, weapon_inference_config.mlflow_artifact_run_id)
+            weapon_segmentation_result = elimination_segmentation.segment_weapon(event, weapon_segmentation_input_prep, weapon_inference_config)
+            player_recognition_result = elimination_segmentation.recognize_players(weapon_segmentation_result, cropped_input, ocr)
 
-         events_with_added_info.append(player_recognition_result)
+            events_with_added_info.append(player_recognition_result)
+         except AssertionError:
+            logger.warning('Failed assertion while extracting result from event in frame: %s, skipping.', name_stem)
+         except:
+            logger.warning('Failed to segment result from given elimination event in frame: %s, skipping.', name_stem)
       
       segmentation_result = dataclasses.replace(segmentation_result, elimination_events=events_with_added_info)
       segmentation_result = postprocessing.remove_duplicate_events(segmentation_result)
-
-      name_stem = image_path.stem
-      json_path = output_dir / f'{name_stem}.json'
 
       data = {}
       # If the json already exists, append data to it.

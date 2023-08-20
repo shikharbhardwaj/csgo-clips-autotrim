@@ -56,6 +56,12 @@ def detect(work_dir: Annotated[Path,
     
     log.info('Getting timeline from work dir: %s', work_dir)
     timeline = get_timeline(work_dir / 'segmentation-results')
+
+    for event in timeline:
+        log.info('Got timeline event in frame idx %d: %s', event.frame_info.idx, event.event)
+
+    with open(work_dir / 'timeline.json', 'w') as f:
+        json.dump({'timeline': [x.to_dict() for x in timeline]}, f, indent=4)
     
     log.info('Got %d events in timeline', len(timeline))
     log.info('Running clutch detection')
