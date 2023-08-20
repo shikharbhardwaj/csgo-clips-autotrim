@@ -97,6 +97,9 @@ def elimination(image_dir_path: Annotated[Path,
        image_dir_path (Path): Path to folder containig image to extract information from.
        output_dir (Path): Path to output directory, with output in JSON format. Defaults to './out'.
    """
+   if not output_dir.exists():
+      output_dir.mkdir(parents=True)
+
    if elimination_inference_config_path is None:
       elimination_inference_config = default_elimination_inference_config
    else:

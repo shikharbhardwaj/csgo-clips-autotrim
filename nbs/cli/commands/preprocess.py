@@ -38,6 +38,9 @@ def downsample(video_path: Annotated[Path,
         output_dir (Annotated[Path, typer.Option, optional): Path to output directory. Defaults to False, dir_okay=True, writable=False, readable=True, resolve_path=True, )]='./out'.
         downsample_config (str, optional): Downsample config represented by a string. Defaults to 'downsample_1280x720_60_RGB'.
     """
+    if not output_dir.exists():
+        output_dir.mkdir(parents=True)
+
     downsample_config = DownsampleConfig.from_str(downsample_config)
     log.info('Downsampling config: %s', downsample_config)
     name_stem = video_path.stem

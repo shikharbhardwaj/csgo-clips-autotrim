@@ -2,12 +2,13 @@ import logging
 
 import typer
 
-from cli.commands import preprocess, segment
+from cli.commands import preprocess, segment, clutch
 
 app = typer.Typer()
 
 app.add_typer(preprocess.app, name='prep')
 app.add_typer(segment.app, name='segment')
+app.add_typer(clutch.app, name='clutch')
 
 
 @app.callback()
