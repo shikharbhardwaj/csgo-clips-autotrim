@@ -2,4 +2,4 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-PYTHONPATH=$SCRIPT_DIR python ./cli/main.py "$@"
+PYTHONPATH=$SCRIPT_DIR python "$SCRIPT_DIR/cli/main.py" "$@"

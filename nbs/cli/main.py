@@ -2,7 +2,7 @@ import logging
 
 import typer
 
-from cli.commands import preprocess, segment, clutch, ingest, serve
+from cli.commands import preprocess, segment, clutch, ingest
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)

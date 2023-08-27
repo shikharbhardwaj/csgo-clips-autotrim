@@ -20,9 +20,8 @@ tritonclient[all]==2.35.0
 streamlit==1.25.0
 rapidfuzz==3.1.2
 onnxruntime==1.15.1
-prefect==2.11.4
-sqlalchemy==2.0.2
 psycopg2-binary==2.9.6
+fastapi==0.103.0
 
 # Add pytorch index URL to install CPU-only packages.
 --extra-index-url https://download.pytorch.org/whl/cpu
