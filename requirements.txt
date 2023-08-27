@@ -13,10 +13,14 @@ aiohttp==3.8.5
     #   tritonclient
 aiosignal==1.3.1
     # via aiohttp
+alembic==1.11.3
+    # via mlflow
 altair==5.0.1
     # via streamlit
 anyio==3.7.1
-    # via starlette
+    # via
+    #   starlette
+    #   watchfiles
 async-timeout==4.0.3
     # via aiohttp
 attrs==23.1.0
@@ -25,7 +29,9 @@ attrs==23.1.0
     #   jsonschema
     #   referencing
 blinker==1.6.2
-    # via streamlit
+    # via
+    #   flask
+    #   streamlit
 boto3==1.26.160
     # via -r requirements.in
 boto3-stubs==1.26.161
@@ -50,13 +56,21 @@ charset-normalizer==3.2.0
     #   requests
 click==8.1.7
     # via
+    #   databricks-cli
+    #   flask
+    #   mlflow
     #   sacremoses
     #   streamlit
     #   typer
+    #   uvicorn
+cloudpickle==2.2.1
+    # via mlflow
 coloredlogs==15.0.1
     # via onnxruntime
 cycler==0.11.0
     # via matplotlib
+databricks-cli==0.17.7
+    # via mlflow
 dataclasses-json==0.5.6
     # via -r requirements.in
 datasets==2.6.1
@@ -65,6 +79,10 @@ dill==0.3.5.1
     # via
     #   datasets
     #   multiprocess
+docker==6.1.3
+    # via mlflow
+entrypoints==0.4
+    # via mlflow
 exceptiongroup==1.1.3
     # via anyio
 fastapi==0.103.0
@@ -76,6 +94,8 @@ filelock==3.12.2
     #   huggingface-hub
     #   torch
     #   transformers
+flask==2.3.3
+    # via mlflow
 flatbuffers==23.5.26
     # via onnxruntime
 fonttools==4.42.1
@@ -97,11 +117,21 @@ geventhttpclient==2.0.2
 gitdb==4.0.10
     # via gitpython
 gitpython==3.1.32
-    # via streamlit
+    # via
+    #   mlflow
+    #   streamlit
 greenlet==2.0.2
-    # via gevent
+    # via
+    #   gevent
+    #   sqlalchemy
 grpcio==1.57.0
     # via tritonclient
+gunicorn==20.1.0
+    # via mlflow
+h11==0.14.0
+    # via uvicorn
+httptools==0.6.0
+    # via uvicorn
 huggingface-hub==0.16.4
     # via
     #   datasets
@@ -118,10 +148,16 @@ idna==3.4
 imageio==2.31.2
     # via scikit-image
 importlib-metadata==6.8.0
-    # via streamlit
+    # via
+    #   mlflow
+    #   streamlit
+itsdangerous==2.1.2
+    # via flask
 jinja2==3.1.2
     # via
     #   altair
+    #   flask
+    #   mlflow
     #   pydeck
     #   torch
 jmespath==1.0.1
@@ -129,17 +165,26 @@ jmespath==1.0.1
     #   boto3
     #   botocore
 joblib==1.3.2
-    # via sacremoses
+    # via
+    #   sacremoses
+    #   scikit-learn
 jsonschema==4.19.0
     # via altair
 jsonschema-specifications==2023.7.1
     # via jsonschema
 kiwisolver==1.4.5
     # via matplotlib
+mako==1.2.4
+    # via alembic
+markdown==3.4.4
+    # via mlflow
 markdown-it-py==3.0.0
     # via rich
 markupsafe==2.1.3
-    # via jinja2
+    # via
+    #   jinja2
+    #   mako
+    #   werkzeug
 marshmallow==3.20.1
     # via
     #   dataclasses-json
@@ -149,9 +194,12 @@ marshmallow-enum==1.5.1
 matplotlib==3.5.1
     # via
     #   -r requirements.in
+    #   mlflow
     #   pycocotools
 mdurl==0.1.2
     # via markdown-it-py
+mlflow==2.4.1
+    # via -r requirements.in
 mpmath==1.3.0
     # via sympy
 multidict==6.0.4
@@ -172,6 +220,7 @@ numpy==1.25.2
     #   datasets
     #   imageio
     #   matplotlib
+    #   mlflow
     #   onnxruntime
     #   opencv-python
     #   pandas
@@ -180,12 +229,15 @@ numpy==1.25.2
     #   pydeck
     #   pywavelets
     #   scikit-image
+    #   scikit-learn
     #   scikit-video
     #   scipy
     #   streamlit
     #   tifffile
     #   transformers
     #   tritonclient
+oauthlib==3.2.2
+    # via databricks-cli
 onnxruntime==1.15.1
     # via -r requirements.in
 opencv-python==4.5.5.62
@@ -193,9 +245,11 @@ opencv-python==4.5.5.62
 packaging==23.0
     # via
     #   datasets
+    #   docker
     #   huggingface-hub
     #   marshmallow
     #   matplotlib
+    #   mlflow
     #   onnxruntime
     #   pytesseract
     #   scikit-image
@@ -206,6 +260,7 @@ pandas==2.0.3
     # via
     #   altair
     #   datasets
+    #   mlflow
     #   streamlit
 pillow==9.5.0
     # via
@@ -218,6 +273,7 @@ pillow==9.5.0
     #   streamlit
 protobuf==3.20.3
     # via
+    #   mlflow
     #   onnxruntime
     #   streamlit
     #   tritonclient
@@ -226,6 +282,7 @@ psycopg2-binary==2.9.6
 pyarrow==12.0.1
     # via
     #   datasets
+    #   mlflow
     #   streamlit
 pycocotools==2.0.6
     # via -r requirements.in
@@ -237,6 +294,8 @@ pygments==2.16.1
     # via rich
 pyhcl==0.4.4
     # via hvac
+pyjwt==2.8.0
+    # via databricks-cli
 pympler==1.0.1
     # via streamlit
 pyparsing==3.1.1
@@ -249,10 +308,14 @@ python-dateutil==2.8.2
     #   matplotlib
     #   pandas
     #   streamlit
+python-dotenv==1.0.0
+    # via uvicorn
 python-rapidjson==1.10
     # via tritonclient
 pytz==2023.3
-    # via pandas
+    # via
+    #   mlflow
+    #   pandas
 pytz-deprecation-shim==0.1.0.post0
     # via tzlocal
 pywavelets==1.4.1
@@ -261,7 +324,11 @@ pyyaml==6.0.1
     # via
     #   datasets
     #   huggingface-hub
+    #   mlflow
     #   transformers
+    #   uvicorn
+querystring-parser==1.2.4
+    # via mlflow
 rapidfuzz==3.1.2
     # via -r requirements.in
 referencing==0.30.2
@@ -274,10 +341,13 @@ regex==2023.8.8
     #   transformers
 requests==2.31.0
     # via
+    #   databricks-cli
     #   datasets
+    #   docker
     #   fsspec
     #   huggingface-hub
     #   hvac
+    #   mlflow
     #   responses
     #   streamlit
     #   transformers
@@ -295,23 +365,35 @@ sacremoses==0.0.53
     # via transformers
 scikit-image==0.19.1
     # via -r requirements.in
+scikit-learn==1.3.0
+    # via mlflow
 scikit-video==1.1.11
     # via -r requirements.in
 scipy==1.11.2
     # via
+    #   mlflow
     #   scikit-image
+    #   scikit-learn
     #   scikit-video
 sentencepiece==0.1.96
     # via -r requirements.in
 six==1.16.0
     # via
+    #   databricks-cli
     #   geventhttpclient
     #   python-dateutil
+    #   querystring-parser
     #   sacremoses
 smmap==5.0.0
     # via gitdb
 sniffio==1.3.0
     # via anyio
+sqlalchemy==2.0.20
+    # via
+    #   alembic
+    #   mlflow
+sqlparse==0.4.4
+    # via mlflow
 starlette==0.27.0
     # via fastapi
 streamlit==1.25.0
@@ -320,8 +402,12 @@ sympy==1.12
     # via
     #   onnxruntime
     #   torch
+tabulate==0.9.0
+    # via databricks-cli
 tenacity==8.2.3
     # via streamlit
+threadpoolctl==3.2.0
+    # via scikit-learn
 tifffile==2023.8.25
     # via scikit-image
 tokenizers==0.13.3
@@ -353,10 +439,12 @@ types-s3transfer==0.6.2
     # via boto3-stubs
 typing-extensions==4.7.1
     # via
+    #   alembic
     #   altair
     #   fastapi
     #   huggingface-hub
     #   pydantic
+    #   sqlalchemy
     #   streamlit
     #   torch
     #   typer
@@ -372,12 +460,26 @@ tzlocal==4.3.1
 urllib3==1.26.16
     # via
     #   botocore
+    #   databricks-cli
+    #   docker
     #   requests
     #   responses
+uvicorn[standard]==0.22.0
+    # via -r requirements.in
+uvloop==0.17.0
+    # via uvicorn
 validators==0.21.2
     # via streamlit
 watchdog==3.0.0
     # via streamlit
+watchfiles==0.20.0
+    # via uvicorn
+websocket-client==1.6.2
+    # via docker
+websockets==11.0.3
+    # via uvicorn
+werkzeug==2.3.7
+    # via flask
 xxhash==3.3.0
     # via datasets
 yarl==1.9.2

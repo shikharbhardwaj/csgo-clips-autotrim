@@ -37,4 +37,6 @@ RUN chown -R $USERNAME:$USERNAME /app
 
 USER 9999
 
-CMD ["/bin/bash"]
+WORKDIR /app/nbs
+
+CMD ["bash", "../scripts/entrypoint.sh"]

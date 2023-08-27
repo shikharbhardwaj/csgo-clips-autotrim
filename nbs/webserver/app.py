@@ -33,7 +33,6 @@ async def start_task(task_request: TaskRequest) -> StartTaskResponse:
 async def get_task(task_id: str) -> GetTaskResponse:
     try:
         task = task_manager.get_task(task_id)
-        logger.info('Got task with id %s: %s', task_id, task)
         if task is None:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
                                 content=GetTaskResponse(result=Result(success=False, reason=f'Task with ID: {task_id} not found')).dict())
