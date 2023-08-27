@@ -3,4 +3,5 @@ jupyterlab
 nbdev
 wandb
 nbdime
-label-studio
+mlflow[extras]==2.4.1
+# label-studio

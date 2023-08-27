@@ -50,3 +50,12 @@ run-docker-dev:
 build-docker:
 	nbdev_export
 	docker build -t csgo-clips-autotrim:$(GIT_SHA) .
+
+update-requirements:
+	pip-compile requirements.in
+
+push-docker:
+	docker tag csgo-clips-autotrim:$(GIT_SHA) docker-registry.tenzing.shkhr.ovh/csgo-clips-autotrim:$(GIT_SHA)
+	docker tag csgo-clips-autotrim:$(GIT_SHA) docker-registry.tenzing.shkhr.ovh/csgo-clips-autotrim:latest
+	docker push docker-registry.tenzing.shkhr.ovh/csgo-clips-autotrim:latest
+	docker push docker-registry.tenzing.shkhr.ovh/csgo-clips-autotrim:$(GIT_SHA)

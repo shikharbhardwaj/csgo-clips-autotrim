@@ -10,7 +10,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -d /home/$USERNAME -m $USERNAME \
     && chown -R $USER_UID:$USER_GID /home/$USERNAME
 
-ENV RUNTIME_PACKAGES="ffmpeg"
+ENV RUNTIME_PACKAGES="ffmpeg ncdu"
 ENV BUILD_PACKAGES="build-essential git"
 
 RUN apt-get update -y && \
