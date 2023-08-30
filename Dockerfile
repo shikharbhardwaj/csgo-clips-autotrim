@@ -35,7 +35,7 @@ RUN pip install -e .
 
 RUN chown -R $USERNAME:$USERNAME /app
 
-USER 9999
+USER $USER_UID
 
 WORKDIR /app/nbs
 
