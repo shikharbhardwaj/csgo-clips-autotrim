@@ -2,9 +2,10 @@ import dataclasses
 import datetime
 import logging
 
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple
 
 from cli.database import Database
+from webserver.models import TaskStatus
 
 logger = logging.getLogger('__name__')
 
@@ -14,6 +15,7 @@ class IngestEntry:
     ingest_id: str
     path: str
     ingested_at_utc: datetime.datetime
+    status: TaskStatus
 
     @classmethod
     def table_name(cls) -> str:
@@ -24,14 +26,35 @@ class IngestEntry:
     
     def _get_field_values(self) -> Tuple[Any]:
         return tuple(getattr(self, name) for name in self._get_field_names())
+    
+    def try_progress_status(self):
+        task_list = list(TaskStatus)
+        current_status_idx = task_list.index(self.status)
+        next_status_idx = current_status_idx + 1
+
+        if len(task_list) + 1 == next_status_idx:
+            raise ValueError('Cannot progress from terminal status.')
+        
+        self.status = task_list[next_status_idx]
 
     @staticmethod
-    def search_ingest_entry(db: Database, ingest_id: str, **kwargs) -> List['IngestEntry']:
+    def search_ingest_entry(db: Database, ingest_id: Optional[str] = None, status: Optional[Tuple] = None, limit: int = 10, offset: int = 0, **kwargs) -> List['IngestEntry']:
         query = f'''
         SELECT * FROM {IngestEntry.table_name()}
-        WHERE ingest_id = %s
+        WHERE 1 = 1 
         '''
-        db.execute_query(query, (ingest_id,))
+        args = tuple()
+
+        if ingest_id is not None:
+            query += ' AND ingest_id = %s'
+            args = args + (ingest_id,)
+        
+        if status is not None:
+            query += ' AND status in %s'
+            args = args + (status,)
+
+        query += f''' ORDER BY ingested_at_utc LIMIT {limit} OFFSET {offset}'''
+        db.execute_query(query, args)
 
         results = [IngestEntry(*row) for row in db.fetch_all()]
         return results

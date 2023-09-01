@@ -29,3 +29,16 @@ class DBConfig:
             user = os.getenv('DB_USER', 'postgres'),
             password = os.getenv('DB_PASS', 'password')
         )
+
+@dataclasses_json.dataclass_json
+@dataclasses.dataclass
+class StorageConfig:
+    bucket_prefix: str
+    endpoint_url: str
+
+    @classmethod
+    def from_env(cls) -> 'StorageConfig':
+        return cls(
+            bucket_prefix=os.getenv('AUTOTRIM_STORAGE_BUCKET_PREFIX', 's3://autotrim/dev'),
+            endpoint_url=os.getenv('AUTOTRIM_STORAGE_ENDPOINT_URL', 'https://minio-api.tenzing.shkhr.ovh')
+        )
