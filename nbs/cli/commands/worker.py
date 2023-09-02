@@ -1,8 +1,10 @@
+import json
 import logging
 from pathlib import Path
 import pathlib
 import tempfile
 import time
+from typing import List
 from typing_extensions import Annotated
 
 import typer
@@ -10,10 +12,11 @@ import typer
 from PIL import Image
 
 from csgo_clips_autotrim.experiment_utils.config import DBConfig, StorageConfig
+from csgo_clips_autotrim.autotrim import TimelineEvent
 from cli.commands import segment, preprocess, clutch
 from cli.database import Database
 from cli.storage import S3BlobStorage
-from cli.models import IngestEntry
+from cli.models import IngestEntry, ResultEntry
 from webserver.models import TaskStatus
 
 logger = logging.getLogger(__name__)
@@ -47,8 +50,7 @@ def worker(source_dir: Annotated[Path,
                                 writable=False,
                                 readable=True,
                                 resolve_path=True,
-                                )] = None,
-          downsample_config: str = 'downsample_1280x720_60_RGB'):
+                                )] = None):
     if db_config_path is None:
         db_config = default_db_config
     else:
@@ -70,9 +72,10 @@ def worker(source_dir: Annotated[Path,
 
     if not candidates:
         logger.info('No ingest entry remaining to work on.')
+        return
     
     ingest_entry = candidates[0]
-    ingest_entry.try_progress_status()
+    ingest_entry.status = TaskStatus.RUNNING
     ingest_entry.save(db)
     logger.info('Working on ingest entry: %s', ingest_entry)
 
@@ -96,7 +99,7 @@ def worker(source_dir: Annotated[Path,
                 logger.info('Finished preprocessing in %f seconds', toc - tic)
             except:
                 logger.exception('Failed to get downsampled frames.')
-                return
+                raise
 
             # Step 2. Elimination segmentation.
             try:
@@ -106,7 +109,7 @@ def worker(source_dir: Annotated[Path,
                 logger.info('Finished segmentation elimination in %f seconds', toc - tic)
             except:
                 logger.exception('Failed to get segmentation results.')
-                return
+                raise
             
             # Step 3. Perform clutch detection.
             try:
@@ -116,12 +119,38 @@ def worker(source_dir: Annotated[Path,
                 logger.info('Finished clutch detection in %f seconds', toc - tic)
             except:
                 logger.exception('Failed to perform clutch detection.')
-                return
+                raise
 
-            # TODO: store a few result artifacts:
+            # Store a few result artifacts:
             # 1. Clutch detection result JSON (in DB)
-            # 2. Timeline JSON (in DB)
-            # 3. Timeline frames (in blob storage)
+            # 2. Timeline (in DB)
+            # 3. Timeline frames (in blobstore)
+            timeline_result_path = work_dir / 'timeline.json'
+            timeline_result = json.loads(timeline_result_path.read_text())
+
+            clutch_detection_result = None
+            clutch_detection_result_path = work_dir / 'clutch_result.json'
+
+            if clutch_detection_result_path.exists():
+                clutch_detection_result = json.loads(clutch_detection_result_path.read_text())
+            
+            result_entry = ResultEntry(ingest_id=ingest_entry.ingest_id,
+                                       timeline=timeline_result,
+                                       clutch_detection_result=clutch_detection_result)
+            result_entry.save(db)
+
+            timeline_events: List[TimelineEvent] = [
+                TimelineEvent.from_dict(x) for x in timeline_result['timeline']
+            ]
+
+            # Upload timeline frames to blob store.
+            for event in timeline_events:
+                frame_path = frame_dir / f'{event.frame_info.name}.png'
+                storage.put(frame_path,
+                            storage_config.bucket_prefix + f'/ingests/{ingest_entry.ingest_id}/timeline/{frame_path.name}')
+
+        ingest_entry.status = TaskStatus.SUCCESS
+        ingest_entry.save(db)
     except:
         logger.info('Storing task status to FAILED')
         ingest_entry.status = TaskStatus.FAILED

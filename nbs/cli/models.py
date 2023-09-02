@@ -1,8 +1,9 @@
+import abc
 import dataclasses
 import datetime
 import logging
 
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from cli.database import Database
 from webserver.models import TaskStatus
@@ -11,7 +12,19 @@ logger = logging.getLogger('__name__')
 
 
 @dataclasses.dataclass
-class IngestEntry:
+class DBModel(abc.ABC):
+    @classmethod
+    def table_name(cls) -> str:
+        raise NotImplementedError()
+
+    def _get_field_names(self) -> Tuple[str]:
+        return tuple(x.name for x in dataclasses.fields(self))
+    
+    def _get_field_values(self) -> Tuple[Any]:
+        return tuple(getattr(self, name) for name in self._get_field_names())
+
+@dataclasses.dataclass
+class IngestEntry(DBModel):
     ingest_id: str
     path: str
     ingested_at_utc: datetime.datetime
@@ -20,12 +33,6 @@ class IngestEntry:
     @classmethod
     def table_name(cls) -> str:
         return 'ingest_queue'
-    
-    def _get_field_names(self) -> Tuple[str]:
-        return tuple(x.name for x in dataclasses.fields(self))
-    
-    def _get_field_values(self) -> Tuple[Any]:
-        return tuple(getattr(self, name) for name in self._get_field_names())
     
     def try_progress_status(self):
         task_list = list(TaskStatus)
@@ -85,7 +92,36 @@ class IngestEntry:
 
 
 @dataclasses.dataclass
-class Result:
+class ResultEntry(DBModel):
     ingest_id: str
-    timeline_result: str
-    clutch_detection_result: str
+    timeline: Dict
+    clutch_detection_result: Dict
+
+    @classmethod
+    def table_name(cls) -> str:
+        return 'result'
+    
+    def save(self, db: Database):
+        field_names = self._get_field_names()
+        field_values = self._get_field_values()
+
+        num_values = len(field_values)
+        placeholders = ['%s'] * num_values
+        placeholder_str = ', '.join(placeholders)
+
+        set_clause = ', '.join([f'{name} = EXCLUDED.{name}' for name in field_names])
+
+        query = f'''
+        INSERT INTO {ResultEntry.table_name()}
+        VALUES ({placeholder_str})
+        ON CONFLICT (ingest_id)
+        DO UPDATE SET 
+            {set_clause}
+        '''
+        try:
+            db.execute_query(query, self._get_field_values())
+            db.commit()
+        except:
+            logger.exception('Failed to save result entry.')
+            db.rollback()
+            raise

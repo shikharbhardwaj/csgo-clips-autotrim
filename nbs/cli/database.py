@@ -1,8 +1,12 @@
 from typing import Any, List, Tuple
 
 import psycopg2
+from psycopg2.extras import Json
+from psycopg2.extensions import register_adapter
 
 from csgo_clips_autotrim.experiment_utils.config import DBConfig
+
+register_adapter(dict, Json)
 
 class Database:
     def __init__(self, config: DBConfig):
