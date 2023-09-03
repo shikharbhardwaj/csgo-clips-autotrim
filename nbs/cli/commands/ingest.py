@@ -14,6 +14,7 @@ import typer
 from csgo_clips_autotrim.experiment_utils.config import DBConfig
 from cli.database import Database
 from cli.models import IngestEntry
+from webserver.models import TaskStatus
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)
@@ -132,7 +133,7 @@ def ingest(source_dir: Annotated[Path,
         relative_path = video.relative_to(source_dir).as_posix()
 
         local_db = Database(db_config)
-        ingest_entry = IngestEntry(ingest_id=file_hash, path=relative_path, ingested_at_utc=datetime.datetime.utcnow())
+        ingest_entry = IngestEntry(ingest_id=file_hash, path=relative_path, ingested_at_utc=datetime.datetime.utcnow(), status=TaskStatus.ACCEPTED)
         ingest_entry.save(local_db)
 
     for month in sorted_months[start_idx:]:
