@@ -34,6 +34,7 @@ def worker(source_dir: Annotated[Path,
                                 writable=False,
                                 readable=True,
                                 resolve_path=True,
+                                envvar='AUTOTRIM_SOURCE_DIR'
                                 )],
           db_config_path: Annotated[Path,
                                 typer.Option(
@@ -51,6 +52,10 @@ def worker(source_dir: Annotated[Path,
                                 readable=True,
                                 resolve_path=True,
                                 )] = None):
+    if not source_dir.exists():
+        logger.error('Source dir: %s does not exist.', source_dir.as_posix())
+        raise ValueError()
+
     if db_config_path is None:
         db_config = default_db_config
     else:
