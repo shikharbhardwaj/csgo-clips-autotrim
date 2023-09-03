@@ -85,10 +85,7 @@ def worker(source_dir: Annotated[Path,
     logger.info('Working on ingest entry: %s', ingest_entry)
 
     try:
-        work_dir = tempfile.mkdtemp(prefix='autotrim-')
-
-        # with tempfile.TemporaryDirectory(prefix='autotrim-', ) as work_dir:
-        if True:
+        with tempfile.TemporaryDirectory(prefix='autotrim-', ) as work_dir:
             logger.info('Wok dir: %s', work_dir)
             video_path = source_dir / ingest_entry.path
 

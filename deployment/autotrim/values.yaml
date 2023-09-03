@@ -87,3 +87,4 @@ autotrim:
   storage_bucket_prefix: <placeholder>
   storage_endpoint_url: <placeholder>
   source_dir: <placeholder>
+  triton_url: <placeholder>
