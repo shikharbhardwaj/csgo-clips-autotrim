@@ -20,7 +20,7 @@ class Manager:
         self._work_dir = pathlib.Path(tempfile.mkdtemp(prefix='autotrim-tasks-'))
         self._tasks_dir = self._work_dir / 'tasks'
         self._tasks_dir.mkdir(exist_ok=True)
-        self._concurrency_limit = 1
+        self._concurrency_limit = os.getenv('AUTOTRIM_CONCURRENCY_LIMIT', 2)
         self._tasks = dict()
         self._lock = threading.Lock()
     
