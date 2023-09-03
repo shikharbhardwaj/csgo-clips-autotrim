@@ -82,3 +82,8 @@ autotrim:
   postgresHost: autotrim-postgresql
   postgresUsername: postgres
   postgresPass: postgres
+  aws_secret_access_key: <placeholder>
+  aws_access_key_id: <placeholder>
+  storage_bucket_prefix: <placeholder>
+  storage_endpoint_url: <placeholder>
+  source_dir: <placeholder>

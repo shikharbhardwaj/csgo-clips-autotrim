@@ -46,6 +46,7 @@ def ingest(source_dir: Annotated[Path,
                                 writable=False,
                                 readable=True,
                                 resolve_path=True,
+                                envvar='AUTOTRIM_SOURCE_DIR'
                                 )],
           db_config_path: Annotated[Path,
                                 typer.Option(
