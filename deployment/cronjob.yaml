@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: worker-runner
+  namespace: autotrim
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: poller
+            image: badouralix/curl-jq:ubuntu
+            command:
+              - /bin/bash
+              - -c
+            args:
+              - |
+                apt update && apt install -y ca-certificates
+
+                # Start the long-running task with a POST request
+                start=$(date +%s)
+                result=$(curl -X 'POST' \
+                    'https://autotrim.tenzing.shkhr.ovh/task' \
+                    -H 'accept: application/json' \
+                    -H 'Content-Type: application/json' \
+                    -d '{
+                    "command": "/app/nbs/autotrim.sh",
+                    "args": [
+                      "worker"
+                    ]
+                  }'
+                )
+
+                trigger_success=$(echo $result | jq -r .result.success)
+                trigger_reason=$(echo $result | jq -r .result.reason)
+                if [[ "$trigger_success" == "false" ]]; then
+                  echo "Failed with reason: $trigger_reason"
+                  exit 1
+                fi
+
+                # Extract the task_id from the response
+                task_id=$(echo $result | jq -r .task_id)
+
+                echo "Started task with id: $task_id"
+
+                # Poll the status of the task until it's finished
+                while true; do
+                  task_status=$(curl -s https://autotrim.tenzing.shkhr.ovh/task?task_id=$task_id)
+                  task_status_success=$(echo $task_status | jq -r .result.success)
+                  task_status_reason=$(echo $task_status | jq -r .result.reason)
+
+                  if [[ "$task_status_success" == "false" ]]; then
+                    echo "Failed with reason: $task_status_reason"
+                    exit 1
+                  fi
+
+                  status=$(echo $task_status | jq -r .task.status)
+                  echo "Got status: $status"
+
+                  if [ "$status" == "SUCCESS" ] || [ "$status" == "FAILED" ]; then
+                    break
+                  fi
+                  sleep 10
+                done
+                end=$(date +%s)
+                runtime=$((end-start))
+
+                echo "Finished in: $runtime seconds"
+          restartPolicy: Never
