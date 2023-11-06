@@ -69,11 +69,14 @@ global:
   storageClass: "freenas-nfs-csi"
 
   postgresql:
+  
     auth:
       postgresPassword: ""
       database: autotrim
 
 postgresql:
+  image:
+    tag: 15.4.0-debian-11-r55
   primary:
     podSecurityContext:
       enabled: false
